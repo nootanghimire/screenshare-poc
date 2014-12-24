@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Check others</title>
+</head>
+<body align="center">
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+	//var ifrm = document.getElementById('all');
+	var socket = io();
+	socket.on('content_srv', function(msg){
+		//Clear all iframes
+		console.log(msg);
+		var b = document.querySelector("iframe");
+		if(b !== null) {
+			document.body.removeChild(document.querySelector("iframe"));	
+		}
+
+		recieveElem(msg);
+	});
+	function recieveElem(amsg){
+		var ifrm=content.document.createElement("iframe");
+		ifrm.src = "about:blank";
+		ifrm.addEventListener('load', function(e){
+			//console.log(amsg);
+			amsg = amsg.replace("</script", "<\/script");
+			amsg = amsg.replace("\n", "\\n");
+			amsg = amsg.replace("\t", "\\t");
+			amsg = amsg.replace("\r", "\\r");
+			amsg = amsg.replace(/\\n/g, "\\n")
+                                      .replace(/\\'/g, "\\'")
+                                      .replace(/\\"/g, '\\"')
+                                      .replace(/\\&/g, "\\&")
+                                      .replace(/\\r/g, "\\r")
+                                      .replace(/\\t/g, "\\t")
+                                      .replace(/\\b/g, "\\b")
+                                      .replace(/\\f/g, "\\f");
+			var obj = JSON.parse(amsg);
+			//var obj  = JSON.parse('{"html":{"lang":"en"},"head":"\\n\\t<meta charset=\\"UTF-8\\">\\n\\t<title>Check ScreenShare</title>\\n\\t<link rel=\\"stylesheet\\" href=\\"main.css\\">\\n\\t<script src=\\"main.js\\"><\/script>\\n","body":"\\n\\t<h1>This is just a test</h1>\\n\\t<p>This is a great thing to do. This is very good.</p>\\n\\n\\n<script src=\\"sendContent.js\\"><\/script>"}');
+			//var obj = JSON.parse(JSONstr);
+			console.log(obj);
+			//ifrm.appendChild(document.createElement("html"));
+			//ifrm.appendChild(document.createElement("head"));
+			//ifrm.appendChild(document.createElement("body"));
+
+			var tag_html = ifrm.contentDocument.getElementsByTagName("html")[0];
+
+			var html_args = obj.html;
+			for (var prop in html_args){
+				tag_html.setAttribute(prop, html_args[prop]);
+			}
+			console.log(tag_html);
+
+			//var tag_head = ifrm.getElementsByTagName("head")[0];
+			ifrm.contentDocument.head.innerHTML = obj.head;
+			//console.log(tag_head);
+			//var tag_body = ifrm.getElementsByTagName("body")[0];
+			ifrm.contentDocument.body.innerHTML = obj.body;
+		});
+		ifrm.setAttribute("width", "80%");
+		ifrm.setAttribute("height", "800px;");
+		document.body.appendChild(ifrm);
+	}
+</script> 
+</html>
